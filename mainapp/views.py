@@ -4,9 +4,12 @@ from rest_framework.generics import CreateAPIView, ListAPIView
 
 from mainapp.models import Client, CSVFile
 from mainapp.serializers import ClientSerializer, CSVSerializer, ClientCSVDataSerializer
+from rest_framework import parsers, renderers
 
 
 class CSVUploadView(CreateAPIView):
+    parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.FileUploadParser)
+    renderer_classes = (renderers.JSONRenderer,)
     queryset = CSVFile.objects.all()
     serializer_class = CSVSerializer
 

@@ -10,22 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-import os
-import environ
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
-env = environ.Env()
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', "key")
+SECRET_KEY = 'django-insecure-*$w^)pll$jd0g)1)3t_f-_$!n6*8leco6*fk0!!po6v3in9&es'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -87,15 +83,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv("POSTGRES_DB", "postgres"),
-        "USER": os.getenv("POSTGRES_USER", "postgres"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "postgres"),
-        "HOST": os.getenv("POSTGRES_HOST", "database"),
-        "PORT": os.getenv("POSTGRES_PORT", "5432"),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": 'db.sqlite3'
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -140,14 +131,3 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'api_key': {
-            'type': 'apiKey',
-            'description': "Type in the *'Value'* input box below: 'Bearer &lt;JWT&gt;', where JWT is the token",
-            'in': 'header',
-            'name': 'Authorization'
-        },
-    },
-}

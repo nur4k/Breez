@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  backend:
+    container_name: backend
+    build: .
+    networks:
+      - stack
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+    volumes:
+      - media:/media/
+      - static:/static/
+    env_file:
+      - .env
+
+  database:
+    image: postgres:15-alpine
+    container_name: postgresql
+    networks:
+      - stack
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+  
+  backend-migrate:
+    restart: "no"
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: migrate
+    networks:
+      - stack
+    entrypoint: "python3 manage.py migrate"
+    depends_on:
+      - database
+    env_file:
+      - .env
+
+networks:
+  stack:
+
+volumes:
+  postgres_data:
+  media:
+  static:

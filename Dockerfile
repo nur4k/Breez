@@ -1,4 +1,4 @@
-FROM python:3.11-slim 
+FROM python:3.11-slim as builder
 WORKDIR /app
 ## Install poetry
 RUN apt-get update && apt-get install -y curl
@@ -10,12 +10,10 @@ ADD ./poetry.lock ./pyproject.toml ./
 RUN poetry config virtualenvs.in-project true
 RUN poetry install --only main
 
-COPY . /app/
-
-RUN python manage.py makemigrations
-RUN python manage.py migrate
-RUN python manage.py collectstatic --noinput
-
-EXPOSE 8000
-
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "core.wsgi:application"]
+FROM python:3.11-slim
+WORKDIR /app
+ENV PATH=/app/.venv/bin:$PATH PYTHONPATH=$PYTHONPATH:/app/
+COPY --from=builder /app/.venv .venv
+COPY . .
+RUN python3 manage.py collectstatic --settings core.settings_test
+ENTRYPOINT ["gunicorn", "core.wsgi", "--bind", "0.0.0.0:8000", "--workers", "4", "--threads", "4"]

@@ -1,6 +1,8 @@
 import csv
 from io import TextIOWrapper
 from django.db.models import Sum, Count
+from django.db import models
+from django.db.models.functions import Cast
 
 from rest_framework import status
 from rest_framework import serializers
@@ -15,6 +17,7 @@ class ClientSerializer(serializers.ModelSerializer):
 
 
 class CSVSerializer(serializers.ModelSerializer):
+    csv_file = serializers.FileField()
     class Meta:
         model = CSVFile
         fields = ('id', 'csv_file')
@@ -39,7 +42,7 @@ class CSVSerializer(serializers.ModelSerializer):
                 client_serializer.save()
             return CSVFile.objects.create(csv_file=csv_file)
         except Exception as e:
-            raise serializers.ValidationError({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            raise serializers.ValidationError({'error': str(e)})
 
 
 class ClientCSVDataSerializer(serializers.ModelSerializer):
@@ -55,10 +58,10 @@ class ClientCSVDataSerializer(serializers.ModelSerializer):
         return data
 
     def get_top_customers(self, instance):  
-        top_customers = Client.objects.values('customer').annotate(spent_money=Sum('total')).order_by('-spent_money')[:5]
+        top_customers = Client.objects.values('customer').annotate(spent_money=Sum(Cast('total', models.FloatField()))).order_by('-spent_money')[:5]
         top_items = Client.objects.values('item').annotate(num_customers=Count('customer')).filter(num_customers__gte=2)
-
         top_customer_data = []
+
         for customer in top_customers:
             customer_data = {
                 'username': customer['customer'],
