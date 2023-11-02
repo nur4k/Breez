@@ -1,3 +1,14 @@
+### Создания переменного окружения / Create Venv
+
+    touch .env 
+### Вставить эти данные в .env / Add in Venv
+    SECRET_KEY=Key
+    POSTGRES_DB=breez_db
+    POSTGRES_USER=postgres
+    POSTGRES_PASSWORD=password
+    POSTGRES_HOST=database
+    POSTGRES_PORT=5432
+
 ### Установка / Installation
 
     docker-compose up --build
